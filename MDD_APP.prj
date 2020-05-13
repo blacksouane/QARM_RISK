@@ -1,14 +1,21 @@
 <deployment-project plugin="plugin.apptool" plugin-version="1.0">
-  <configuration file="C:\Users\Benjamin\OneDrive\Documents\GitHub\QARM\MDD_APP.prj" location="C:\Users\Benjamin\OneDrive\Documents\GitHub\QARM" name="MDD_APP" target="target.mlapps" target-name="Package App">
+  <configuration build-checksum="1866521322" file="C:\Users\Benjamin\OneDrive\Documents\GitHub\QARM_RISK\MDD_APP.prj" location="C:\Users\Benjamin\OneDrive\Documents\GitHub\QARM_RISK" name="MDD_APP" target="target.mlapps" target-name="Package App">
     <param.appname>MDD_APP</param.appname>
-    <param.authnamewatermark />
-    <param.email />
-    <param.company />
+    <param.authnamewatermark>Benjamin Souane</param.authnamewatermark>
+    <param.email>benjamin.souane@unil.ch</param.email>
+    <param.company>University of Lausanne</param.company>
     <param.icon />
     <param.icons />
-    <param.summary />
-    <param.description />
-    <param.screenshot>C:\Users\Benjamin\AppData\Local\Temp\tp40833bc3_5246_4082_9b2e_dcf8ee0e9057.png</param.screenshot>
+    <param.summary>Maximum drawdown Interface</param.summary>
+    <param.description>Application allowing the user to choose the following parameters :
+&lt;ul&gt;&lt;li&gt;Frequency of observation&lt;/li&gt;&lt;/ul&gt;
+&lt;ul&gt;&lt;li&gt;Length of the path&lt;/li&gt;&lt;/ul&gt;
+&lt;ul&gt;&lt;li&gt;Confidence level&lt;/li&gt;&lt;/ul&gt;
+
+to display the conditional expected drawdown. 
+
+The user can also use Simulated AR1 processes to see the effect of auto-correlations</param.description>
+    <param.screenshot>C:\Users\Benjamin\AppData\Local\Temp\tp83d411a2_e0e5_469f_8d03_173d66fa03ac.png</param.screenshot>
     <param.version>1.0</param.version>
     <param.products.name />
     <param.products.id />
@@ -17,13 +24,8 @@
     <param.output>${PROJECT_ROOT}</param.output>
     <param.guid>90a34910-1a61-45a4-855b-9da4d260c504</param.guid>
     <unset>
-      <param.authnamewatermark />
-      <param.email />
-      <param.company />
       <param.icon />
       <param.icons />
-      <param.summary />
-      <param.description />
       <param.version />
       <param.products.name />
       <param.products.id />
@@ -35,13 +37,18 @@
       <file>${PROJECT_ROOT}\MDD_APP.mlapp</file>
     </fileset.main>
     <fileset.depfun>
+      <file>${PROJECT_ROOT}\330px-Logo_HEC_Lausanne.png</file>
       <file>${PROJECT_ROOT}\CED.m</file>
+      <file>${PROJECT_ROOT}\DateConverter.m</file>
+      <file>${PROJECT_ROOT}\FrequencyConverter.m</file>
       <file>${PROJECT_ROOT}\MDD_Distribution.m</file>
     </fileset.depfun>
-    <fileset.resources />
+    <fileset.resources>
+      <file>${PROJECT_ROOT}\matlab.mat</file>
+    </fileset.resources>
     <fileset.package />
     <build-deliverables>
-      <file location="C:\Users\Benjamin\OneDrive\Documents\GitHub" name="QARM" optional="false">C:\Users\Benjamin\OneDrive\Documents\GitHub\QARM</file>
+      <file location="C:\Users\Benjamin\OneDrive\Documents\GitHub" name="QARM_RISK" optional="false">C:\Users\Benjamin\OneDrive\Documents\GitHub\QARM_RISK</file>
     </build-deliverables>
     <workflow />
     <matlab>
