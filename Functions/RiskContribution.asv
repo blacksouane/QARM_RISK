@@ -8,15 +8,7 @@ function [MCR, CED_Portfolio] = RiskContribution(Data, Weights, Alpha, Window,h)
 % involved mathematically and therefore the implementation is done by
 % numerical differentiation. 
 
-% The drawback of this function is that the estimation is relatively noisy
-% since it relies on empirical partial derivatives. 
-
-% The numerical partial derivative is implemented using the "Symetric
-% Derivative": 
-
-% f'(w_i) = lim (h -> 0) (f(w+h) + f(x-h))/2h
-% Where w +/- h means that the weights of asset i is changed by h and the
-% other are the same.
+% The drawback of this function is that the 
 
 
 % INPUT : 

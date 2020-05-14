@@ -57,32 +57,32 @@ print(f, 'Plots/PathLength','-dpng','-r1000')
 
 
 % TAKE A LOT OF TIME, ONLY USEFUL TO DO A 3D PLOT
-Path.LenSpace = 100:10:5000;
- Path.AlphaSpace = 0.01:0.01:0.99;
- Path.PathAlphaMat = zeros(length(Path.LenSpace), length(Path.AlphaSpace));
- countI = 1;
- countJ = 1;
- for i = Path.LenSpace
-    disp(i)
-    temp = MDD_Distribution(Data.mkt,i);
-    for j = Path.AlphaSpace
-    [~, Path.PathAlphaMat(countI, countJ)] = CED(temp,j);
-    countJ = countJ + 1;
-    end
-     countI = countI + 1;
-     countJ = 1;
-end
-
-f = figure('visible','on');
-colormap(hot(256));
-surf(Path.AlphaSpace, Path.LenSpace, Path.PathAlphaMat)
-camlight right;
-lighting phong;
-shading interp
-xlabel('1 - Alpha')
-ylabel('Number of Day')
-zlabel('CED')
-print(f, 'Plots/3D_AlphaPathCED','-dpng', '-r1000')
+% Path.LenSpace = 100:10:5000;
+%  Path.AlphaSpace = 0.01:0.01:0.99;
+%  Path.PathAlphaMat = zeros(length(Path.LenSpace), length(Path.AlphaSpace));
+%  countI = 1;
+%  countJ = 1;
+%  for i = Path.LenSpace
+%     disp(i)
+%     temp = MDD_Distribution(Data.mkt,i);
+%     for j = Path.AlphaSpace
+%     [~, Path.PathAlphaMat(countI, countJ)] = CED(temp,j);
+%     countJ = countJ + 1;
+%     end
+%      countI = countI + 1;
+%      countJ = 1;
+% end
+% 
+% f = figure('visible','on');
+% colormap(hot(256));
+% surf(Path.AlphaSpace, Path.LenSpace, Path.PathAlphaMat)
+% camlight right;
+% lighting phong;
+% shading interp
+% xlabel('1 - Alpha')
+% ylabel('Number of Day')
+% zlabel('CED')
+% print(f, 'Plots/3D_AlphaPathCED','-dpng', '-r1000')
 
 % ********************************************************************
 % Frequency of observations
