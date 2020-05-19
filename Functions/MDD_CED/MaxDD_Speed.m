@@ -31,7 +31,7 @@ for k = 1:size(MaxDD,1)
       
   else 
       
-      % Find first recovery
+      % Find first recovery (if many)
       MaxDDRecovery(k) = EqualPeaks(1) + MaxDDIndex(k,2)+ 1;
        
   end

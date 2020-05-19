@@ -95,6 +95,7 @@ count = 1;
 for i = Frequency.FreqSpace
     
     for j = 1:3
+        
         if j == 1
             temp = MDD_Distribution(Data.mkt,i);
             [~, Frequency.CED_Freq(count, j)] = CED(temp,Alpha); 
@@ -166,18 +167,31 @@ ArRelation = fitlm(Nspace', Data.CED_SIMULATED','VarNames', {'Kappa', 'CED'});
 
 f = figure('visible', 'on');
 yyaxis left
-ylabel('CED Scale')
 plot(Nspace(1:end-30), smooth(Data.CED_SIMULATED(1:end-30)))
+ylabel('CED Scale')
 hold on
 yyaxis right
-plot(Nspace(1:end-30), smooth(Data.ES_SIMULATED(1:end-30)))
+plot(Nspace(1:end-30), smooth(abs(Data.ES_SIMULATED(1:end-30))))
 hold on
 plot(Nspace(1:end-30), smooth(Data.Vola_SIMULATED(1:end-30)))
 xlabel('AutoCorrelation Factor')
 ylabel('Vol and ES scale')
 title('Measure of risk for different level of AutoCorrelation')
-legend('CED', 'ES', 'Vol','location','best')
+legend('CED', 'ES', 'Vol','location','northwest')
 print(f, 'Plots/AutoCorrelation','-dpng','-r1000')
+
+
+f = figure('visible', 'on');
+histogram(Data.MDD_Simulated(:,21),'EdgeAlpha',0.5,'Normalization','probability')
+hold on
+histogram(Data.MDD_Simulated(:,81),'EdgeAlpha',0.5,'Normalization','probability')
+xlabel('MDD')
+ylabel('Frequency')
+title('Distribution of MDD for different level of autocorrelation')
+legend('K = 0.2', 'K = 0.8','location','best')
+print(f, 'Plots/HistAutoCorrelation','-dpng','-r1000')
+
+
 
 % ********************************************************************
 % AR1 fit rolling window
@@ -273,7 +287,7 @@ Prediction.GPR = fitrgp(Prediction.XTrain,Prediction.yTrain,...
 Prediction.yPred = predict(Prediction.GPR,Prediction.XTest);
 Prediction.Loss = loss(Prediction.GPR, Prediction.XTest,Prediction.yTest);
 
-% Plot of the prediction
+% Scatter plots of the predictions
 f = figure('visible','on');
 scatter(Prediction.yPred,Prediction.yTest)
 hold on
@@ -286,7 +300,7 @@ title('Recovery Period prediction')
 legend('Prediction X True value','Perfect prediction Line','location','southeast')
 print(f, 'Plots/SpeedRecoveryPred','-dpng','-r1000')
 
-% Plot of the prediction
+% Line plot of the predictions
 f = figure('visible','on');
 plot(Prediction.yTest,'.')
 hold on
@@ -299,12 +313,11 @@ print(f, 'Plots/SpeedRecoveryPred','-dpng','-r1000')
 
 clear i j count SIMDATA temp tempData f
 
-% 3d plot
+% Three Dim. plot of the Speed/Recovery/Value of MDD
 xNodes = 0:0.001:1;
 yNodes = linspace(10, 850, 1001);
 z = gridfit(MaxDD.MDD, MaxDD.SpeedMDD, MaxDD.SpeedRecover, xNodes, yNodes,...
     'smoothness', 0.7);
-
 figure = figure('visible','on');
 colormap(hot(256));
 surf(xNodes,yNodes,z);
@@ -316,6 +329,16 @@ ylabel('Speed of the DrawDown in Days')
 zlabel('Recovery Period in Days')
 title 'Recovery Speed w.r.t to the speed and intensity of the DD'
 print(figure, 'Plots/3d','-dpng','-r1000')
+
+% ********************************************************************
+% Intensity of Drawdown
+% ********************************************************************
+
+% We define the intensity as the 
+MaxDD.Intensity = MaxDD.MDD/MaxDD.SpeedMDD;
+
+
+
 %% Risk Contribution
 
 ImportIndustryData;
@@ -330,15 +353,19 @@ Industry.Date = Industry.Date(1:24704);
 Industry.Names = {'Consumer NonDurables', 'Consumer Durables', 'Manufacturing', ...
     'Energy, Oil, Gas', 'Tech', 'Telecom', 'Wholesale and Retail', ...
     'Healthcare', 'Utilities','Other'};
+
+% ********************************************************************
 % Equally weighted Portfolio
+% ********************************************************************
+
 [Industry.NumDays, Industry.NumAsset] = size(Industry.Data);
 Industry.Alpha = 0.05;
-Industry.LenPath = 125;
+Industry.LenPath = 250;
 Industry.EQ = sum(Industry.Data,2)./Industry.NumAsset;
 
 % Marginal Risk Contribution
 h = 0.001;
-Window = 500;
+Window = 1000;
 Industry.EqWeights = ones(1,Industry.NumAsset)./Industry.NumAsset;
 [Industry.MCR, Industry.CED] = RiskContribution(Industry.Data,...
     Industry.EqWeights, Industry.Alpha, Window,h);
@@ -349,10 +376,70 @@ for days = 1:length(Industry.MCR)
     Industry.FRC(days, :) = Industry.FRC(days, :)./sum(Industry.FRC(days, :));
 end
 
-
+% Plot of the industry weights - CED
 f = figure('visible', 'on');
-area(Industry.Date(1001:end),Industry.FRC)
+area(Industry.Date(2001:end),Industry.FRC)
 ylim([-0.1 1.1])
+set (gcf, 'position' , [10, 10, 800, 400])
 legend(Industry.Names, 'location','bestoutside')
-title('Fractional Contribution to risk of each industry')
-print(f, 'Plots/MCRarea','-dpng','-r1000')
+xlabel('Date')
+ylabel('% contribution to CED')
+title('Fractional Contribution to CED of each industry')
+print(f, 'Plots/CED_AREA_EQ','-dpng','-r1000')
+
+Industry.MCR_Vol = MCR_VOL(ones(size(Industry.Data))*0.1,...
+    Industry.Data, 100);
+
+% Plot of the industry weights - Vol
+f = figure('visible', 'on');
+area(Industry.Date(101:end),Industry.MCR_Vol)
+ylim([-0.1 1.1])
+set (gcf, 'position' , [10, 10, 800, 400])
+legend(Industry.Names, 'location','bestoutside')
+xlabel('Date')
+ylabel('% contribution to Vol')
+title('Fractional Contribution to volatility of each industry')
+print(f, 'Plots/VOL_AREA_EQ','-dpng','-r1000')
+
+% ********************************************************************
+% Risk Parity Portfolio
+% ********************************************************************
+
+% Computing allocation
+Industry.RiskParity = RiskParity(ones(size(Industry.Data))*0.1, ...
+    Industry.Data, 0.3, 125);
+
+% Computing contribution to risk of Vol
+Industry.MCRVOLRISKPAR = MCR_VOL(Industry.RiskParity, ...
+    Industry.Data(126:end,:), 125);
+
+% Computing contribution to risk of CED 
+[Industry.MCRCEDRISKPAR] = RiskContributionGeneral(Industry.Data(126:end,:), Industry.RiskParity,Industry.Alpha, Window,h);
+
+Industry.MCRCEDRISKPARSCALED = Industry.MCRCEDRISKPAR;
+for days = 1:length(Industry.MCRCEDRISKPAR)
+Industry.MCRCEDRISKPARSCALED(days,:) = Industry.MCRCEDRISKPAR(days,:)/sum(Industry.MCRCEDRISKPAR(days,:));
+end
+
+% Plotting the contribution to risk - CED
+f = figure('visible', 'on');
+area(Industry.Date(2126:end),Industry.MCRCEDRISKPARSCALED)
+ylim([-0.1 1.1])
+set (gcf, 'position' , [10, 10, 800, 400])
+legend(Industry.Names, 'location','bestoutside')
+xlabel('Date')
+ylabel('% contribution to CED')
+title('Fractional Contribution to CED of each industry')
+print(f, 'Plots/CED_AREA_RP','-dpng','-r1000')
+
+% Plotting the contribution to risk - CED
+f = figure('visible', 'on');
+area(Industry.Date(251:end),Industry.MCRVOLRISKPAR)
+ylim([-0.1 1.1])
+set (gcf, 'position' , [10, 10, 800, 400])
+legend(Industry.Names, 'location','bestoutside')
+xlabel('Date')
+ylabel('% contribution to Vol')
+title('Fractional Contribution to volatility of each industry')
+print(f, 'Plots/VOL_AREA_RP','-dpng','-r1000')
+

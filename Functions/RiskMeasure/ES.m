@@ -1,4 +1,4 @@
-function [VaR, ES, LossDistribution] = ES(Process,Alpha)
+function [VaR, ES, Distribution] = ES(Process,Alpha)
 
 % Pre - Processing
 [nDays, nAsset] = size(Process);
@@ -9,9 +9,9 @@ Price(2:end,:) = cumprod(1+Process);
 
 % Computing the Var
 Distribution = sort((Price(1:end-1,:) - Price(2:end,:))./Price(1:end-1,:));
-LossDistribution = abs(Distribution(Distribution < 0));
-VaR = quantile(LossDistribution,Alpha);
+VaR = quantile(Distribution,Alpha);
 
 % Computing the Expected shortfall
-ES = mean(LossDistribution(LossDistribution >= VaR));
+ES = abs(mean(Distribution(Distribution <= VaR)));
+
 end

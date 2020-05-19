@@ -54,7 +54,7 @@ function [MaxDD, MaxDDIndex] = maxdrawdown(Data, Format)
 % Step 1 - check arguments
 
 if nargin < 1 || isempty(Data)
-	disp('Error');
+	disp('Error 1');
 end
 
 if ~isscalar(Data) && isvector(Data) && isa(Data,'double')
@@ -63,7 +63,7 @@ if ~isscalar(Data) && isvector(Data) && isa(Data,'double')
 elseif ismatrix(Data) && size(Data, 1) > 1 && isa(Data,'double')
 	[~, N] = size(Data);
 else
-	disp('Error');
+	disp('Error 2');
 end
 
 if nargin < 2 || isempty(Format)
@@ -71,11 +71,11 @@ if nargin < 2 || isempty(Format)
 else
     Format = convertStringsToChars(Format);
     if ~ischar(Format) || size(Format,1) ~= 1
-       disp('Error');
+       disp('Error 3');
     else
         choice = find(strncmpi(Format,{'return','arithmetic','geometric'},length(Format)));
         if isempty(choice)
-         disp('Error');
+         disp('Error 4');
         end
     end
 end
@@ -84,7 +84,7 @@ end
 
 if choice == 1 || choice == 3
 	if any(any(Data <= 0))
-		disp('Error');
+		disp('Error 5');
 	end
 end
 
