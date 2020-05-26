@@ -7,13 +7,16 @@ Repository for the Quantitative asset and risk management - Risk Project
 This project is based on :
 
 
-* **DRAWDOWN: FROM PRACTICE TO THEORY AND BACK AGAIN**
+------------------------------------------------------------------------------------------------------------------------------
+**DRAWDOWN: FROM PRACTICE TO THEORY AND BACK AGAIN**
 Lisa R. Goldberg and Ola Mahmoud
 You can find this paper [here](https://arxiv.org/pdf/1404.7493.pdf).
 
+------------------------------------------------------------------------------------------------------------------------------
+
 This paper introduce the **Conditional Expected Drawdown** which is the tail mean of the distribution of Drawdown. This risk measure is coherent and therefore allows to construct portfolio based on it and to compute the marginal contribution of an asset to the overall risk. 
 
-![Schema_CED](https://github.com/blacksouane/QARM_RISK/blob/master/Plots/MDD_Distribution.png)
+![Schema_CED](https://github.com/blacksouane/QARM_RISK/blob/master/Plots/MDD_Distribution.png =100x20)
 
 Hence, the purpose of this project is to expose the properties of maximum Drawdown and CED. Typically, we will show the relation between CED and the frequency of observation, the auto-correlation of the underlying process and the length of the path.
 
