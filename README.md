@@ -28,9 +28,10 @@ The code is relatively computotionnaly intensive and therefore takes a lot of ti
 
 ### Authors
 
-* **Alessia Di Pietro** 
 * **Antoine-Michel Alexeev** 
+* **Julien Bisch**
 * **Benjamin Souane** 
+* **Ludovic Suchet**
 
 ### Acknowledgement
 
