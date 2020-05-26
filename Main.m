@@ -259,6 +259,20 @@ ylabel('Ndays')
 legend('Recovery Speed', 'Drawdown Speed','location','best')
 print(f, 'Plots/SpeedRecoveryLine','-dpng','-r1000')
 
+% Scatter - Recovery / MDD
+f = figure('visible','on');
+scatter(MaxDD.MDD(3000:end), MaxDD.SpeedRecover(3000:end));
+a = lsline;
+a.Color = 'r';
+set (gcf, 'position' , [10, 10, 800, 400])
+title('Correlation between MDD and recovery')
+xlabel('MDD')
+legend('MDD - Recovery','OLS fit', 'location', 'eastoutside')
+xlim([min(MaxDD.MDD(3000:end))-0.05, max(MaxDD.MDD(3000:end))+0.05])
+ylabel('Recovery (Days)')
+print(f, 'Plots/ScatterRecoveryMDD','-dpng','-r1000')
+
+
 % Analysing the relation
 Prediction.LM = fitlm([MaxDD.MDD, MaxDD.SpeedMDD], MaxDD.SpeedRecover,...
     'VarNames', {'Intensity', 'Speed','Recovery'});
@@ -443,3 +457,74 @@ ylabel('% contribution to Vol')
 title('Fractional Contribution to volatility of each industry')
 print(f, 'Plots/VOL_AREA_RP','-dpng','-r1000')
 
+%% Intraday Bitcoin
+
+ImportBitcoinPrices
+% NaN = No activity on the price, therefore we fill the NaN with the
+% previous value
+Bitcoin = Bitcoin(:, 1:2); % Take out volume
+Intraday.Bitcoin = fillmissing(Bitcoin, 'previous');
+Intraday.Bitcoin = table2array(Intraday.Bitcoin(:, 2)); % Take out unix
+
+% Need to convert from unix time to date time
+Intraday.Date = datetime(table2array(Bitcoin(:,1)), 'ConvertFrom', 'posixtime' );
+
+% Clear temporary variables
+clear Bitcoin
+
+% Let's juste take complete days
+Intraday.Date = Intraday.Date(969:end);
+Intraday.Bitcoin = Intraday.Bitcoin(969:end);
+
+% Find Hourly/Daily/Weekly closing prices and corresponding Datetime vector
+Intraday.HourlyPrice = Intraday.Bitcoin(1:60:end);
+Intraday.HoursDate = Intraday.Date(1:60:end);
+Intraday.DailyPrice = Intraday.Bitcoin(1:1440:end);
+Intraday.DailyDate = Intraday.Date(1:1440:end);
+Intraday.WeeklyPrice = Intraday.Bitcoin(1:7*1440:end);
+Intraday.WeeklyDate = Intraday.Date(1:7*1440:end);
+
+% CED Computations, Intraday, hours, Days, Weekly
+Intraday.PathDays = 125; 
+Intraday.PathWeeks = round(125/7);
+Intraday.PathHours = 125*24;
+Intraday.PathMinutes = 125*1440;
+
+[Intraday.CED.Minutes, Intraday.MDD.Minutes] = ...
+    CED_Bitcoin(Intraday.Bitcoin(1000*24*60+1:end), Intraday.PathMinutes, 0.05);
+[Intraday.CED.Hours, Intraday.MDD.Hours] = ...
+    CED_Bitcoin(Intraday.HourlyPrice(1000*24+1:end), Intraday.PathHours, 0.05);
+[Intraday.CED.Days, Intraday.MDD.Days] = ...
+    CED_Bitcoin(Intraday.DailyPrice(1000+1:end), Intraday.PathDays, 0.05);
+[Intraday.CED.Weeks, Intraday.MDD.Weeks] = ...
+    CED_Bitcoin(Intraday.WeeklyPrice(round(1000/7):end), Intraday.PathWeeks, 0.05);
+
+% Histogram of the DD distribution
+f = figure('visible', 'on');
+histogram(Intraday.MDD.Minutes, 30,'Normalization','probability')
+hold on
+histogram(Intraday.MDD.Hours,30, 'Normalization','probability')
+hold on
+histogram(Intraday.MDD.Days, 30,'Normalization','probability')
+hold on
+xline(Intraday.CED.Minutes,'label','CED 5% Minutes','color','#A2142F')
+hold on 
+xline(Intraday.CED.Hours,'label','CED 5% Hours','color','#77AC30')
+hold on
+xline(Intraday.CED.Days,'label','CED 5% Days','LabelHorizontalAlignment',...
+    'left','color','#D95319')
+set (gcf, 'position' , [10, 10, 800, 400])
+legend('Minutes','Hours','Days','location','eastoutside')
+xlabel('MDD')
+ylabel('Frequency')
+title('Distribution of MDD for BTC between 2013 and 2020')
+print(f, 'Plots/HistIntradayBTC','-dpng','-r1000')
+
+% Plot of the price
+f = figure('visible', 'on');
+plot(Intraday.Date(3000000:end),Intraday.Bitcoin(3000000:end))
+ylabel('Bitcoin Price is USD from 2017 to 2020')
+xlabel('Date')
+title('History of Bitcoin Price in USD')
+ytickformat('usd')
+print(f, 'Plots/PriceBTC','-dpng','-r1000')
