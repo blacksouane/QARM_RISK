@@ -21,7 +21,7 @@ opts.ExtraColumnsRule = "ignore";
 opts.EmptyLineRule = "read";
 
 % Import the data
-FFResearchDataFactorsdaily = readtable("C:\Users\Benjamin\OneDrive\Documents\GitHub\QARM_RISK\F-F_Research_Data_Factors_daily.CSV", opts);
+FFResearchDataFactorsdaily = readtable("Data\F-F_Research_Data_Factors_daily.CSV", opts);
 
 
 %% Clear temporary variables

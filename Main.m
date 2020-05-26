@@ -1,15 +1,22 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Quantitative Asset And Risk Management 
+% Risk Project - Conditional Expected Drawdown 
+
+% Based on the paper :" Drawdown: From Practice to theory and back again "
+%
+%  From Lisa R. Goldberg and Ola Mahmoud
 
 
+% Benjamin Souane, Antoine-Michel Alexeev, Ludovic Suchet and Julien Bisch
+% Due Date: April 2020
+%==========================================================================
 
 clc 
 close all
-rng('default');
+rng('default'); % Fix a random seed
 
-%import KevinShepperd Toolbox
-addpath(genpath('C:\Users\Benjamin\OneDrive\1. HEC\Master\MScF 4.2\EMF\2020\Homeworks\KevinSheperdToolBox'));
-
-% Import function library
-addpath(genpath('C:\Users\Benjamin\OneDrive\Documents\GitHub\QARM_RISK'))
+%Importing all the libraries in the directory
+addpath(genpath(pwd));
 
 %% Data Import and preprocessing
 disp('Import Data')

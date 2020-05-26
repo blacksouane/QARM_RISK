@@ -26,7 +26,7 @@ opts = setvaropts(opts, ["Var2", "Var3", "Var4", "Var7", "Var8"], "WhitespaceRul
 opts = setvaropts(opts, ["Var2", "Var3", "Var4", "Var7", "Var8"], "EmptyFieldRule", "auto");
 
 % Import the data
-Bitcoin = readtable("C:\Users\Benjamin\OneDrive\Documents\GitHub\QARM_RISK\bitstampUSD_1-min_data_2012-01-01_to_2020-04-22.csv", opts);
+Bitcoin = readtable("Data\bitstampUSD_1-min_data_2012-01-01_to_2020-04-22.csv", opts);
 
 
 %% Clear temporary variables
