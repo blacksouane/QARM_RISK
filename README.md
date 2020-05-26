@@ -18,7 +18,7 @@ Lisa R. Goldberg and Ola Mahmoud
 
 This paper introduce the **Conditional Expected Drawdown** which is the tail mean of the distribution of Drawdown. This risk measure is coherent and therefore allows to construct portfolio based on it and to compute the marginal contribution of an asset to the overall risk. 
 
-<img src="https://github.com/blacksouane/QARM_RISK/blob/master/Plots/MDD_Distribution.png" height="100" width="100"> 
+<img src="https://github.com/blacksouane/QARM_RISK/blob/master/Plots/MDD_Distribution.png" height="400" width="600"> 
 
 Hence, the purpose of this project is to expose the properties of maximum Drawdown and CED. Typically, we will show the relation between CED and the frequency of observation, the auto-correlation of the underlying process and the length of the path.
 
