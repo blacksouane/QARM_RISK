@@ -1,4 +1,4 @@
-function [WeightsOpti] = RiskParityAllocation(Weights,Returns,Target,LengthPath, Alpha)
+function [WeightsOpti, MCR] = RiskParityAllocation(Weights,Returns,Target,LengthPath, Alpha)
 %Optimisation of the Risk parity Weighting Scheme
 
 %   This function take the following Inputs:
@@ -29,7 +29,7 @@ function [WeightsOpti] = RiskParityAllocation(Weights,Returns,Target,LengthPath,
 
 %Setting the size of the output. 
 WeightsOpti = zeros(1500+2*LengthPath, asset);
-
+MCR = zeros(1500+2*LengthPath, asset);
 %Setting the unused parameters of the optimisation (matlab obligates it)
 A = []; %No linear constraint
 b = []; %No linear constraint
@@ -53,25 +53,34 @@ Aeq = [];
 beq = [];
         
 % Setting options
-options = optimoptions(@fmincon,'Algorithm','sqp',...
-'MaxIterations',1000000,'ConstraintTolerance',1.0000e-10, ...
-'OptimalityTolerance',1.0000e-10,'MaxFunctionEvaluations',...
-1000000,'display','none');
+options = optimoptions(@fmincon,'Algorithm','interior-point',...
+'MaxIterations',1000000,'ConstraintTolerance',1.0000e-6, ...
+'OptimalityTolerance',1.0000e-6,'MaxFunctionEvaluations',...
+1000000);
 
 for i = 2*LengthPath+1:2*LengthPath+1500
-        
 
-        % Optimizing the weights 
-  WeightsOpti(i, :) = fmincon(fun,Weights(i, :),A,b,Aeq,beq,lb,ub,...
-            @(x)CED_Constraint(x,Returns,Target,LengthPath,i, Alpha)...
+      % Optimizing the weights
+       
+  [x,~,~,~,lambda,~,~] = fmincon(fun,Weights(i, :),A,b,Aeq,beq,lb,ub,...
+          @(x)CED_Constraint(x,Returns, Target, LengthPath, i, Alpha)...
             ,options);
+        
+        
+     WeightsOpti(i, :) = x;
      
-        % Going for the next rebalancing 
-        disp(i)
+     for assets = 1:length(x)
+     MCR(i, assets) = 1/(x(assets)*lambda.ineqnonlin);
+     end
+     disp(MCR)
+     % Going for the next rebalancing 
+     disp(i)
 end
     
     disp('Optimisation is finished !')
    
+    % We delete the part of the matrix that was here for the computations
     WeightsOpti = WeightsOpti(2*LengthPath+1:end,:);
+    MCR = MCR(2*LengthPath+1:end,:);
 end
 

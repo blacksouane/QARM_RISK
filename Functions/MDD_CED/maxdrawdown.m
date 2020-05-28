@@ -82,11 +82,11 @@ end
 
 % Step 2 - compute maximum drawdown
 
-if choice == 1 || choice == 3
-	if any(any(Data <= 0))
-		disp('Error 5');
-	end
-end
+%if choice == 1 || choice == 3
+%	if any(any(Data <= 0))
+%		disp('Error 5');
+%	end
+%end
 
 if choice == 3
     Data = log(Data);

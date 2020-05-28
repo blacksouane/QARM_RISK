@@ -18,6 +18,8 @@ function [MCR, CED_Portfolio] = RiskContribution(Data, Weights, Alpha, Window,h)
 % Where w +/- h means that the weights of asset i is changed by h and the
 % other are the same.
 
+% Finally, this function calls "PortfolioCED" to compute the CED that we numerically
+% differentiate.
 
 % INPUT : 
 
@@ -37,18 +39,21 @@ function [MCR, CED_Portfolio] = RiskContribution(Data, Weights, Alpha, Window,h)
 
 
 
+% Parameters
 [~, NumAsset] = size(Data);
-Signal = [1,-1];
+Signal = [1,-1]; % +/- h for the derivation
 MCR = zeros(length(Data) - 2*Window, NumAsset);
 
+% Loop computing the differentation. I was not able to vectorize the
+% process to speed it up. 
  for Asset = 1:NumAsset
       fprintf('Asset Number %s of the %s total assets',string(Asset),string(NumAsset))
-      ChangedWeights = Weights;
+      ChangedWeights = Weights; % Temporary Variables to change the weights
       ChangedWeights(Asset) = ChangedWeights(Asset) + Signal(1)*h;
       Temp = PortfolioCED(ChangedWeights, Data, Alpha, Window);
-      ChangedWeights(Asset) = ChangedWeights(Asset) + 2*Signal(2)*h;  
+      ChangedWeights(Asset) = ChangedWeights(Asset) + 2*Signal(2)*h; % Directly go for + h to - h 
       Temp2 = PortfolioCED(ChangedWeights, Data, Alpha, Window);
-      MCR(:,Asset) = (Temp - Temp2)./(2*h);
+      MCR(:,Asset) = (Temp - Temp2)./(2*h); % Implementation of the differentiation
  end
  
  CED_Portfolio = PortfolioCED(Weights, Data, Alpha, Window);

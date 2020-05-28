@@ -133,11 +133,11 @@ Frequency.FrequencyRelation = fitlm(Frequency.Freq, Frequency.toFit, 'Categorica
     'VarNames', {'Path Length', 'Frequency', 'CED'});
 
 f = figure('visible', 'on');
-plot(Frequency.FreqSpace, Frequency.CED_Freq(:, 1))
+plot(Frequency.FreqSpace, Frequency.CED_Freq(:, 1),'color','#0072BD')
 hold on
-plot(Frequency.FreqSpace, Frequency.CED_Freq(:, 2))
+plot(Frequency.FreqSpace, Frequency.CED_Freq(:, 2),'color','#000000')
 hold on
-plot(Frequency.FreqSpace, Frequency.CED_Freq(:, 3))
+plot(Frequency.FreqSpace, Frequency.CED_Freq(:, 3),'color','#A2142F')
 xlabel('Path Length')
 ylabel('CED')
 title('CED at 5% for different Path Length')
@@ -174,13 +174,13 @@ ArRelation = fitlm(Nspace', Data.CED_SIMULATED','VarNames', {'Kappa', 'CED'});
 
 f = figure('visible', 'on');
 yyaxis left
-plot(Nspace(1:end-30), smooth(Data.CED_SIMULATED(1:end-30)))
+plot(Nspace(1:end-30), smooth(Data.CED_SIMULATED(1:end-30)),'color','#0072BD')
 ylabel('CED Scale')
 hold on
 yyaxis right
-plot(Nspace(1:end-30), smooth(abs(Data.ES_SIMULATED(1:end-30))))
+plot(Nspace(1:end-30), smooth(abs(Data.ES_SIMULATED(1:end-30))),'color','#000000')
 hold on
-plot(Nspace(1:end-30), smooth(Data.Vola_SIMULATED(1:end-30)))
+plot(Nspace(1:end-30), smooth(Data.Vola_SIMULATED(1:end-30)),'color','#A2142F')
 xlabel('AutoCorrelation Factor')
 ylabel('Vol and ES scale')
 title('Measure of risk for different level of AutoCorrelation')
@@ -335,12 +335,10 @@ print(f, 'Plots/SpeedRecoveryPred','-dpng','-r1000')
 clear i j count SIMDATA temp tempData f
 
 % Three Dim. plot of the Speed/Recovery/Value of MDD
-xNodes = 0:0.001:1;
+xNodes = 0.0:0.001:1;
 yNodes = linspace(10, 850, 1001);
-z = gridfit(MaxDD.MDD, MaxDD.SpeedMDD, MaxDD.SpeedRecover, xNodes, yNodes,...
-    'smoothness', 0.7);
+z = gridfit(MaxDD.MDD, MaxDD.SpeedMDD, MaxDD.SpeedRecover, xNodes, yNodes);
 figure = figure('visible','on');
-colormap(hot(256));
 surf(xNodes,yNodes,z);
 camlight right;
 lighting phong;
@@ -348,17 +346,10 @@ shading interp
 xlabel('DrawDown in %')
 ylabel('Speed of the DrawDown in Days')
 zlabel('Recovery Period in Days')
+zlim([0,5500])
+ylim([100, 1000])
 title 'Recovery Speed w.r.t to the speed and intensity of the DD'
 print(figure, 'Plots/3d','-dpng','-r1000')
-
-% ********************************************************************
-% Intensity of Drawdown
-% ********************************************************************
-
-% We define the intensity as the 
-MaxDD.Intensity = MaxDD.MDD/MaxDD.SpeedMDD;
-
-
 
 %% Risk Contribution
 
@@ -464,6 +455,112 @@ ylabel('% contribution to Vol')
 title('Fractional Contribution to volatility of each industry')
 print(f, 'Plots/VOL_AREA_RP','-dpng','-r1000')
 
+
+
+% ********************************************************************
+% CED Parity
+% ********************************************************************
+
+[Optimal, MCROptimal] = RiskParityAllocation(Weights, Industry.Data, 0.5, 250, 0.1); %Performed on ~5years of data
+OptimalScaled = ones(size(Optimal));
+for balancing = 1:length(Optimal)
+    Scale = sum(Optimal(balancing, :));
+    for assets = 1:size(Optimal,2)
+    OptimalScaled(balancing, assets) = Optimal(balancing, assets)/Scale;
+    end
+end
+
+% Computing Contribution to risk
+MCROptim = RiskContributionGeneral(Industry.Data(1:2000), OptimScaled, 0.1, 250, 0.001);
+
+Contribution = MCROptim(501:end, :).*Optimal(501:end,:); % the process need 500 data point to "start"
+
+FRC_CEDPARITY = Contribution;
+for balancing = 1:length(FRC_CEDPARITY)
+    Scale = sum(Contribution(balancing, :));
+    for assets = 1:size(Contribution,2)
+    FRC_CEDPARITY(balancing, assets) = Contribution(balancing, assets)/Scale;
+    end
+end
+
+% plotting the results
+f = figure('visible', 'on');
+area(Industry.Date(1001:2000),FRC_CEDPARITY)
+ylabel('Contribution to CED')
+xlabel('Date')
+ylim([-0.1, 1.1])
+set (gcf, 'position' , [10, 10, 800, 400])
+legend(Industry.Names,'location','eastoutside')
+title('Contribution to CED of a CED Parity allocation')
+print(f, 'Plots/AreaCEDPARITY','-dpng','-r1000')
+
+% plotting the results
+f = figure('visible', 'on');
+area(Industry.Date(1001:2000),OptimalScaled(501:1500, :))
+ylabel('Weights')
+xlabel('Date')
+set (gcf, 'position' , [10, 10, 800, 400])
+legend(Industry.Names,'location','eastoutside')
+title('Weights of a CED Parity allocation')
+print(f, 'Plots/AreaCEDPARITYWeights','-dpng','-r1000')
+
+% Computing contribution to volatility
+MCR_VOL_CEDPARITY = MCR_VOL(OptimalScaled,Industry.Data(501:2000,:), 100);
+f = figure('visible', 'on');
+area(Industry.Date(1001:2000),MCR_VOL_CEDPARITY(401:end, :))
+ylabel('Weights')
+xlabel('Date')
+ylim([0,1])
+set (gcf, 'position' , [10, 10, 800, 400])
+legend(Industry.Names,'location','eastoutside')
+title('Contribution to volatilty of a CED Parity allocation')
+print(f, 'Plots/AreaCEDPARITYVolContribution','-dpng','-r1000')
+
+% ********************************************************************
+% Allocation between Rm et Rf
+% ********************************************************************
+
+Path.WmarketSpace = 0.01:0.01:0.99;
+Path.AlphaSpace = 0.01:0.01:0.99;
+Path.CED_PortfolioDistribution = zeros(length(Path.WmarketSpace), length(Path.AlphaSpace));
+Path.ES_PortfolioDistribution = zeros(length(Path.WmarketSpace), length(Path.AlphaSpace));
+countI = 1;
+countJ = 1;
+ for i = Path.WmarketSpace
+    disp(i)
+    for j = Path.AlphaSpace
+        [Path.CED_PortfolioDistribution(countI, countJ),Path.ES_PortfolioDistribution(countI, countJ)]...
+            = CED_portfolio(Data.mkt,Data.rf,i,j,LenPath);
+        countJ = countJ + 1;
+    end
+    
+    countI = countI + 1;
+    countJ = 1;
+ end
+clear countI countJ i j
+% Plot CED 
+f = figure('visible','on');
+colormap(hot(256));
+surf(Path.AlphaSpace, Path.WmarketSpace, Path.CED_PortfolioDistribution)
+camlight right;
+lighting phong;
+shading interp
+xlabel('1-Alpha')
+ylabel('W market')
+zlabel('CED')
+print(f, 'Plots/3D_PortfolioCED','-dpng', '-r1000')
+
+% Plot ES
+f = figure('visible','on');
+colormap(hot(256));
+surf(Path.AlphaSpace, Path.WmarketSpace, Path.ES_PortfolioDistribution)
+camlight right;
+lighting phong;
+shading interp
+xlabel('Alpha')
+ylabel('W market')
+zlabel('ES')
+print(f, 'Plots/3D_PortfolioES','-dpng', '-r1000')
 %% Intraday Bitcoin
 
 ImportBitcoinPrices
@@ -535,3 +632,6 @@ xlabel('Date')
 title('History of Bitcoin Price in USD')
 ytickformat('usd')
 print(f, 'Plots/PriceBTC','-dpng','-r1000')
+
+% deleting temporary variables
+clear h ax balancing days f figure h i LenPath Scale z xNodes yNodes a Alpha assets Window
