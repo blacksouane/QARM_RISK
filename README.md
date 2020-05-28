@@ -38,7 +38,7 @@ We use two dataset of the Fama/French data:
 - Fama/French [3 factors](https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/Data_Library/f-f_factors.html) daily (to extract the rf and rm values)
 - Fama/French [10 industry Portfolio](https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/Data_Library/det_10_ind_port.html) daily
 
-We also used intraday bictoin prices. The data are to heavy to be on this repository but can find them here : [Bitcoin Data on Kaggle](https://www.kaggle.com/mczielinski/bitcoin-historical-data). The code should work even if you time span is bigger than ours.
+We also used intraday bictoin prices. The data are to heavy to be on this repository but can find them here : [Bitcoin Data on Kaggle](https://www.kaggle.com/mczielinski/bitcoin-historical-data). So you can download them and put them in the "Data" folder. The code should work even if you time span is bigger than ours.
 
 ## Implementation
 
