@@ -29,7 +29,7 @@ Finally, we use different asset allocation methods and compute the contribution 
 1. Equally Weighted
 2. Risk Parity
 
-The last part of the paper takes intraday bitcoin prices to look at the properties of CED for high frequency trading. 
+The last part of the paper takes intraday bitcoin prices to look at the properties of CED for high frequency trading and look at the properties of a CED parity allocation. 
 
 ## Data
 
