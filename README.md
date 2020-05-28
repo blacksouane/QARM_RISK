@@ -42,7 +42,11 @@ We also used intraday bictoin prices. The data are to heavy to be on this reposi
 
 ## Implementation
 
-The code is relatively computotionnaly intensive and therefore takes a lot of time to run (around 10 hours on my computer). Thus, we have provided a instance of our Workspace with all the data and computations already done. This can allow you to just do or change to computations that you want and not everything.
+The code is relatively computotionnaly intensive and therefore takes a lot of time to run (around 10 hours on my computer). Thus, we have provided a instance of our Workspace with all the data and computations already done ('SavedInstance/LastInstance.mat'). This can allow you to just do or change to computations that you want and not everything.
+
+### Interface
+
+We have also implemented an interface allowing the user to visualize the evolution of Drawdown with different parameters. However, this app is not optimised and therefore is running relatively slowly. You can use the "MDD_APP" matlab app installer file.
 
 ### Authors
 
